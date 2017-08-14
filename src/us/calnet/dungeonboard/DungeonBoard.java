@@ -49,6 +49,18 @@ public class DungeonBoard extends Application {
 	}
 	
 	public static void main(String[] args) {
+		// Check for existence of media directory
+		File froot = new File(System.getProperty("user.home") + File.separator + "DungeonBoard");
+		File fsub1 = new File(System.getProperty("user.home") + File.separator + "DungeonBoard" + File.separator + "Backgrounds");
+		File fsub2 = new File(System.getProperty("user.home") + File.separator + "DungeonBoard" + File.separator + "Effects");
+		
+		if (!(froot.isDirectory() && fsub1.isDirectory() && fsub2.isDirectory())) {
+			if (!(fsub1.mkdirs() && fsub2.mkdir())) {
+				System.err.println("Media directories could not be created!");
+				System.exit(1);
+			}
+		}
+		
 		launch(args);
 	}
 	
