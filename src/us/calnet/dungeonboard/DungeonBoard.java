@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
@@ -100,10 +101,14 @@ public class DungeonBoard extends Application {
 								BufferedInputStream bis = new BufferedInputStream(fis);
 								Player player = new Player(bis);
 								player.play();
+								bis.close();
+								fis.close();
 							} catch (FileNotFoundException ex) {
-								System.out.println(ex.getMessage());
+								System.err.println("[ERROR] File: " + ex.getLocalizedMessage());
 							} catch (JavaLayerException ex) {
-								System.out.println("Whoops!");
+								System.err.println("[ERROR] JLayer: " + ex.getLocalizedMessage());
+							} catch (IOException ex) {
+								System.err.println("[ERROR] File IO: " + ex.getLocalizedMessage());
 							}
 						}
 					});
