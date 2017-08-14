@@ -7,6 +7,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import java.io.File;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
+import javazoom.jl.decoder.JavaLayerException;
+import javazoom.jl.player.Player;
 
 public class DungeonBoard extends Application {
 	
@@ -18,7 +25,16 @@ public class DungeonBoard extends Application {
 			
 			@Override
 			public void handle(ActionEvent event) {
-				System.out.println("Doot doot!");
+				try {
+					FileInputStream fis = new FileInputStream(new File("skullsound2.mp3"));
+					BufferedInputStream bis = new BufferedInputStream(fis);
+					Player player = new Player(bis);
+					player.play();
+				} catch (FileNotFoundException ex) {
+					System.out.println(ex.getMessage());
+				} catch (JavaLayerException ex) {
+					System.out.println("Whoops!");
+				}
 			}
 		});
 		
