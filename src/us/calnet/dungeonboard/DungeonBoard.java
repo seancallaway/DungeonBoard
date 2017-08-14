@@ -1,6 +1,7 @@
 package us.calnet.dungeonboard;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -9,6 +10,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Slider;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -16,6 +18,8 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+
 import java.io.File;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -26,6 +30,9 @@ import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
 
 public class DungeonBoard extends Application {
+	
+	private boolean _backgroundPlaying = false;
+	private AudioPlayer _backgroundPlayer;
 	
 	@Override
 	public void start(Stage primaryStage) {
@@ -41,24 +48,33 @@ public class DungeonBoard extends Application {
 			backgroundComboBox.setValue("No files found!");
 		}
 		
-		Button btn = new Button();
-		btn.setText("Play sound");
-		btn.setOnAction(new EventHandler<ActionEvent>() {
+		Button backgroundBtn = new Button();
+		backgroundBtn.setText("\u25B6");
+		backgroundBtn.setOnAction(new EventHandler<ActionEvent>() {
 			
 			@Override
 			public void handle(ActionEvent event) {
-				try {
-					FileInputStream fis = new FileInputStream(new File("skullsound2.mp3"));
-					BufferedInputStream bis = new BufferedInputStream(fis);
-					Player player = new Player(bis);
-					player.play();
-				} catch (FileNotFoundException ex) {
-					System.out.println(ex.getMessage());
-				} catch (JavaLayerException ex) {
-					System.out.println("Whoops!");
+				if (_backgroundPlaying == false) {
+					String bgPath = backgroundFiles[backgroundComboBox.getSelectionModel().getSelectedIndex()].getPath();
+					try {
+						_backgroundPlayer = new AudioPlayer(bgPath, false);
+						_backgroundPlayer.start();
+						_backgroundPlaying = true;
+						backgroundBtn.setText("\u23F8");
+					} catch (Exception ex) {
+						System.out.println(ex.getMessage());
+					}
+				} else {
+					backgroundBtn.setText("\u25B6");
+					_backgroundPlayer.close();
+					_backgroundPlaying = false;
 				}
 			}
 		});
+		if (backgroundFilenames.get(0) == "No files found!") {
+			System.out.println("Disable button.");
+			backgroundBtn.disableProperty().set(true);
+		}
 		
 		GridPane grid = new GridPane();
 		grid.setHgap(10);
@@ -68,14 +84,14 @@ public class DungeonBoard extends Application {
 		HBox hbox = new HBox();
 		hbox.setPadding(new Insets(15, 12, 15, 12));
 		hbox.setSpacing(10);
-		hbox.getChildren().addAll(backgroundComboBox, btn);
+		hbox.getChildren().addAll(backgroundComboBox, backgroundBtn);
 		grid.add(hbox, 0, 0);
 		
 		FlowPane fp = new FlowPane();
 		fp.setPadding(new Insets(5, 0, 5, 0));
 		fp.setVgap(4);
 		fp.setHgap(4);
-		fp.setPrefWrapLength(250);
+		fp.setPrefWrapLength(475);
 		
 		File effectsFolder = new File(System.getProperty("user.home") + File.separator + "DungeonBoard" + File.separator + "Effects");
 		File[] effectsFiles = effectsFolder.listFiles();	
@@ -122,10 +138,18 @@ public class DungeonBoard extends Application {
 		
 		grid.add(fp, 0, 1);
 		
-		Scene scene = new Scene(grid, 300, 250);
+		Scene scene = new Scene(grid, 600, 500);
 		
 		primaryStage.setTitle("DungeonBoard");
 		primaryStage.setScene(scene);
+		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+			@Override
+			public void handle(WindowEvent t) {
+				_backgroundPlayer.close();
+				Platform.exit();
+				System.exit(0);
+			}
+		});		
 		primaryStage.show();
 	}
 	
