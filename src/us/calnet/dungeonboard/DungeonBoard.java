@@ -19,15 +19,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-
 import java.io.File;
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
-import javazoom.jl.decoder.JavaLayerException;
-import javazoom.jl.player.Player;
 
 public class DungeonBoard extends Application {
 	
@@ -113,18 +105,10 @@ public class DungeonBoard extends Application {
 						@Override
 						public void handle(ActionEvent event) {
 							try {
-								FileInputStream fis = new FileInputStream(new File(path));
-								BufferedInputStream bis = new BufferedInputStream(fis);
-								Player player = new Player(bis);
-								player.play();
-								bis.close();
-								fis.close();
-							} catch (FileNotFoundException ex) {
-								System.err.println("[ERROR] File: " + ex.getLocalizedMessage());
-							} catch (JavaLayerException ex) {
-								System.err.println("[ERROR] JLayer: " + ex.getLocalizedMessage());
-							} catch (IOException ex) {
-								System.err.println("[ERROR] File IO: " + ex.getLocalizedMessage());
+								AudioPlayer player = new AudioPlayer(path, false);
+								player.start();
+							} catch (Exception ex) {
+								System.err.println("[ERROR]: " + ex.getLocalizedMessage());
 							}
 						}
 					});
