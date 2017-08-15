@@ -20,6 +20,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import java.io.File;
+import java.util.ArrayList;
 
 public class DungeonBoard extends Application {
 	
@@ -86,7 +87,8 @@ public class DungeonBoard extends Application {
 		fp.setPrefWrapLength(475);
 		
 		File effectsFolder = new File(System.getProperty("user.home") + File.separator + "DungeonBoard" + File.separator + "Effects");
-		File[] effectsFiles = effectsFolder.listFiles();	
+		File[] effectsFiles = effectsFolder.listFiles();
+		ArrayList<Player> players = new ArrayList<Player>();
 		if (effectsFiles.length == 0) {
 			Text noFiles = new Text("No effect files found!");
 			noFiles.setFont(Font.font("Arial", FontWeight.BOLD, 20));
@@ -97,16 +99,25 @@ public class DungeonBoard extends Application {
 			for (int i = 0; i < effectsFiles.length; i++) {
 				try {
 					final String path = effectsFiles[i].getPath();
+					final int count = i;
 					effectButtons[i] = new Button();
 					effectButtons[i].setText(effectsFiles[i].getName());
 					System.out.println(effectButtons[i].getText());
+					players.add(new Player(path, 85));
 					effectButtons[i].setOnAction(new EventHandler<ActionEvent>() {
 						
 						@Override
 						public void handle(ActionEvent event) {
 							try {
-								AudioPlayer player = new AudioPlayer(path, false);
-								player.start();
+								//AudioPlayer player = new AudioPlayer(path, false);
+								//player.start();
+								if (players.get(count).isPlaying()) {
+									players.get(count).pause();
+									players.get(count).close();
+								} else {
+									players.get(count).start();
+									players.get(count).play();
+								}
 							} catch (Exception ex) {
 								System.err.println("[ERROR]: " + ex.getLocalizedMessage());
 							}
