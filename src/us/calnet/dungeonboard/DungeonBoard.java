@@ -129,7 +129,12 @@ public class DungeonBoard extends Application {
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 			@Override
 			public void handle(WindowEvent t) {
-				_backgroundPlayer.close();
+				try {
+					_backgroundPlayer.close();
+				} catch (NullPointerException ex) {
+					// _backgroundPlayer was never instantialized
+					// no action required.	
+				}
 				Platform.exit();
 				System.exit(0);
 			}
